@@ -1,0 +1,10 @@
+# dockerignore file dont burden the context with unnecessary stuff
+assignments
+week*
+VagrantFile
+.vagrant
+.git
+*.vim
+*.md
+*.swp
+__*

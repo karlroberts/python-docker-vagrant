@@ -1,0 +1,26 @@
+.vagrant
+*.class
+*.log
+assignments
+videos
+
+# sbt specific
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+
+# Intellij specific cruft
+.idea
+*.iws
+.history
+.idea_modules
+gen
+out
+tmp
+mysession.vim
