@@ -1,6 +1,7 @@
 # dockerignore file dont burden the context with unnecessary stuff
 assignments
-week*
+lessons
+videos
 VagrantFile
 .vagrant
 .git

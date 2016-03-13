@@ -3,6 +3,7 @@
 *.log
 assignments
 videos
+lessons
 
 # sbt specific
 dist/*
@@ -24,3 +25,6 @@ gen
 out
 tmp
 mysession.vim
+
+#ipyhon stuff
+**/.ipynb_checkpoints

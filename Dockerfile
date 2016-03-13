@@ -38,7 +38,24 @@ FROM ubuntu:trusty-20160302
 # Get rid of bourne shell issues
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
+# mandiatry build-args
+ARG email
+ARG graphlabkey
+ENV MYEMAIL=$email
+ENV MYGRAPHLABKEY=$graphlabkey
+
 # Information
+RUN echo "using build-arg email of: " $MYEMAIL
+RUN echo "using build-arg graphlabkey of: " $MYGRAPHLABKEY
+
+RUN if [ -z ${MYEMAIL+x} ]; then echo "OOPS YOU DID NOT SET --build-arg emmail=<your email>"; exit 13; else echo "using email=$MYEMAIL";fi 
+RUN if [ -z ${MYGRAPHLABKEY+x} ]; then echo "OOPS YOU DID NOT SET --build-arg graphlabkey=<your graphlabkey>"; exit 13; else echo "using graphlabkey=$MYGRAPHLABKEY";fi 
+
+
+RUN echo I will run the following command to install graphlab
+RUN echo "source dato-env/bin/activate --system-site-packages && pip install --upgrade pip && pip install --upgrade --no-cache-dir https://get.dato.com/GraphLab-Create/1.8.3/${MYEMAIL}/${MYGRAPHLABKEY}/GraphLab-Create-License.tar.gz"
+
+
 RUN echo "Building Karl's Machine Learning Specialisation env"
 
 RUN echo "The Course uses Python with 'ipython notebook' for experimenting and demos"
@@ -86,35 +103,6 @@ RUN apt-get update -y && apt-get -y install \
   python3 python-pip python-dev \
   build-essential
 
-# use python pip to install python tools inc itself
-RUN echo "Installing python-y stuff using pip"
-
-RUN pip install --upgrade pip
-# prevent insecure platform warnings on pip downloads
-RUN pip install --upgrade ndg-httpsclient
-RUN pip install --upgrade cryptography
-RUN pip install --upgrade pyopenssl ndg-httpsclient pyasn1
-RUN pip install --upgrade urllib3[secure]
-RUN pip install --upgrade virtualenv
-
-# install iPython notebook
-RUN pip install pyzmq
-RUN pip install jinja2
-RUN pip install pygments
-RUN pip install tornado
-RUN pip install jsonschema
-RUN pip install ipython
-RUN pip install --upgrade ipython[notebook]
-RUN pip install --upgrade matplotlib
-
-# do it all in a python virtualenv or else graphlab cant install because it tried to deleate a pip tmp dir after runnin tornado tests
-RUN virtualenv dato-env
-# Data products for graphlab registered non comercial for coursera use
-# Registered email address: karl.roberts@owtelse.com
-# Product key: 4908-0CC7-1900-78B1-3A8F-300D-7D7F-1971
-# Install your licensed copy of GraphLab Create
-RUN source dato-env/bin/activate --system-site-packages && pip install --upgrade pip && pip install --upgrade --no-cache-dir https://get.dato.com/GraphLab-Create/1.8.3/karl.roberts@owtelse.com/4908-0CC7-1900-78B1-3A8F-300D-7D7F-1971/GraphLab-Create-License.tar.gz
-
 # set up ssh server run space
 RUN mkdir -p /var/run/sshd
 RUN chmod 700 /var/run/sshd
@@ -138,10 +126,48 @@ RUN echo "vagrant ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 # add the docker config in case we want to add docker on the docker :-/
 ADD shells/etc_default_docker.txt /etc/default/docker
 
+#
+# use python pip to install python tools inc itself
+RUN echo "Installing python-y stuff using pip"
+
+RUN pip install --upgrade pip
+# prevent insecure platform warnings on pip downloads
+RUN pip install --upgrade ndg-httpsclient
+RUN pip install --upgrade cryptography
+RUN pip install --upgrade pyopenssl ndg-httpsclient pyasn1
+RUN pip install --upgrade urllib3[secure]
+RUN pip install --upgrade virtualenv
+
+# install iPython notebook
+RUN pip install pyzmq
+RUN pip install jinja2
+RUN pip install pygments
+RUN pip install tornado
+RUN pip install jsonschema
+RUN pip install ipython
+RUN pip install --upgrade ipython[notebook]
+RUN pip install --upgrade matplotlib
+
+# do it all in a python virtualenv or else graphlab cant install because it tried to deleate a pip tmp dir after runnin tornado tests
+RUN virtualenv dato-env
+RUN echo "Gonna now run this graphlab install"
+RUN echo "source dato-env/bin/activate --system-site-packages && pip install --upgrade pip && pip install --upgrade --no-cache-dir https://get.dato.com/GraphLab-Create/1.8.3/${MYEMAIL}/${MYGRAPHLABKEY}/GraphLab-Create-License.tar.gz"
+RUN source dato-env/bin/activate --system-site-packages && pip install --upgrade pip && pip install --upgrade --no-cache-dir https://get.dato.com/GraphLab-Create/1.8.3/${MYEMAIL}/${MYGRAPHLABKEY}/GraphLab-Create-License.tar.gz
+
 # config jupytrer notebook to be a server that listens on all ip's so i can get to it from Host OS
 RUN su - vagrant -c "jupyter notebook --generate-config"
 RUN echo "c.NotebookApp.ip = '*'" >> /home/vagrant/.jupyter/jupyter_notebook_config.py
 RUN echo "c.NotebookApp.port = 8888" >> /home/vagrant/.jupyter/jupyter_notebook_config.py
+
+# copy the graphlab/config file to the vagrant user so he can use the licence in there.
+# create the config dir if neccessary as the vagrant user
+RUN su - vagrant -c "mkdir -p /home/vagrant/.graphlab"
+RUN cp /root/.graphlab/config /home/vagrant/.graphlab
+RUN chown vagrant:vagrant /home/vagrant/.graphlab
+
+# link the lessons and assignments in the /vagrant folder (ie in the root dir of the build that vagrant maps)
+RUN su - vagrant -c "ln -s /vagrant/lessons ./lessons  && ln -s /vagrant/assignments ./assignments"
+
 
 # let Docker know we will expose the ipthon port
 EXPOSE 8888

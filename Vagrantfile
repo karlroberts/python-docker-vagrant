@@ -11,10 +11,7 @@ Vagrant.configure(2) do |config|
 
   # docker - initially build from a Dockerfile then when happy cut an image
   config.vm.hostname = "docker-host"
-#  config.vm.network :forwarded_port, guest: 8888, host: 18888
   config.vm.provider "docker" do |d, override|
-  #  override.vm.box = 
-    
     # Uncomment below to use th image rather than build  from Dockerfile
     #d.image = "foo/myimage"
 
@@ -24,8 +21,10 @@ Vagrant.configure(2) do |config|
     # Uncomment elow to specify a particular Dockerfile default is DockerFile in build_dir
     #d.dockerfile = "Dockerfile"
 
-    # tag the container image
-    d.build_args = ["--tag=mlpythontag"]
+    #                                     
+    #                                                                                                                 4908-0CC7-1900-78B1-3A8F-300D-7D7F-1971
+    # SET YOUR GRAPHLAB email and graphlabkey BELOW and tag the container image
+    d.build_args = ["--tag=mlpythontag", "--build-arg", "email=you.email@foo.bar.com", "--build-arg", "graphlabkey=AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA"]
 
     # vagrant can auto map the ssh ports
     d.has_ssh = true
