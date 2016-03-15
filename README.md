@@ -27,7 +27,7 @@ Bear in mind that the first time you run it vagrant up will provission the Docke
 ```
    vagrant up
    vagrant ssh
-   source dato-env/bin/activate
+   source /dato-env/bin/activate
    jupyter notebook
 ```
 
