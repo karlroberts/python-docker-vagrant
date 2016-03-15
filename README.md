@@ -1,7 +1,8 @@
 run:
+```
     vagrant up
     vagrant ssh # open a shell on the vagrant box
-
+```
 
 ## To install jupyter notebook ( formally known as iPython notebook)
 Because python depends on System libraries and python libs which also 
@@ -23,11 +24,12 @@ You could aso edit the Dockerfile to give default values to the ARGS , see [dock
 Once this small edit is done you can run the commands below to create and launch the vagrant box.
 Bear in mind that the first time you run it vagrant up will provission the Docker Container. This can take 5-10 mins the first time (on a fast network). To speed this up a premade image exists in ./shells which the Vagrantfile uses by default. see [FAQ](#faq) below to build from the Dockerfile
 
-
+```
    vagrant up
    vagrant ssh
    source dato-env/bin/activate
    jupyter notebook
+```
 
 now open your browser at http://localhost:8888 et voila!
 
