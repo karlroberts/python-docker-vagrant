@@ -1,0 +1,11 @@
+# dockerignore file dont burden the context with unnecessary stuff
+assignments
+lessons
+videos
+VagrantFile
+.vagrant
+.git
+*.vim
+*.md
+*.swp
+__*
