@@ -11,7 +11,9 @@ Docker Containter and Vagrant will treat it as a "box"
 
 This leads to a very fast to launch and run dev box to work with python and the jupyter notebook from.
 
-You will need to have (installed vagrant)[https://www.vagrantup.com/downloads.html] and if you are on linux and want to run the container nativley (recommended for speed) you will need to (install docker)[https://docs.docker.com/engine/installation/] although Vagrant will attempt to do so if it can't find it.
+You will need to have (installed vagrant)[https://www.vagrantup.com/downloads.html] and if you are on linux and want to run the container nativley (recommended for speed) you will need to (install docker)[https://docs.docker.com/engine/installation/] (although Vagrant will attempt to install Docker in a helper VM if it can't find it and is on a system that doesn't nativly support Docker like MacOS).
+
+If you are on Ubuntu (>= 14.04) the AUFS filesystem that Docker uses in not installed in the Kernel by default, but you can use the newer (better?) overlayFS that is already installed by adding the following to the /etc/default/docker file (see the example file in shells/etc_default_docker.txt )
 
 ## <a name="launch"></a>launch
 
