@@ -163,7 +163,7 @@ RUN echo "c.NotebookApp.port = 8888" >> /home/vagrant/.jupyter/jupyter_notebook_
 # create the config dir if neccessary as the vagrant user
 RUN su - vagrant -c "mkdir -p /home/vagrant/.graphlab"
 RUN cp /root/.graphlab/config /home/vagrant/.graphlab
-RUN chown vagrant:vagrant /home/vagrant/.graphlab
+RUN chown -R vagrant:vagrant /home/vagrant/.graphlab
 
 # link the lessons and assignments in the /vagrant folder (ie in the root dir of the build that vagrant maps)
 RUN su - vagrant -c "ln -s /vagrant/lessons ./lessons  && ln -s /vagrant/assignments ./assignments"
@@ -178,9 +178,19 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/
 RUN chmod +x /usr/bin/tini
 
 # If I wanted to run the notebook as a server from a container uncomment next 2 lines and romove the lines after these two
-# ENTRYPOINT ["/usr/bin/tini", "--"]
-# CMD ["jupyter", "notebook", "--port=8888", "--no-browser", "--ip=0.0.0.0"]
+RUN mkdir -p /usr/local/bin
+RUN echo -e "#!/bin/bash \n\
+service ssh restart\n\
+su - vagrant -c \"source /dato-env/bin/activate && jupyter notebook --port=8888 --no-browser --ip=0.0.0.0\" & \n\
+top -b " \
+>> /usr/local/bin/launch
+RUN chmod a+x /usr/local/bin/launch
+
+#ENTRYPOINT ["service", "ssh", "restart", "&&","/usr/bin/tini", "--"]
+ENTRYPOINT ["/usr/local/bin/launch"]
+# CMD ["top", "-b"]
+# CMD ["source", "/dato-env/bin/activate", "&&", "jupyter", "notebook", "--port=8888", "--no-browser", "--ip=0.0.0.0"]
 
 # kick off sshd and run top for ever so the container keeps running so we can ssh to this box.
-ENTRYPOINT service ssh restart && top -b
-CMD ["-c"]
+#ENTRYPOINT service ssh restart && top -b
+# CMD ["-c"]
